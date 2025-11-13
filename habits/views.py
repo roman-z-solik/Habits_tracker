@@ -11,22 +11,24 @@ class HabitViewSet(viewsets.ModelViewSet):
     serializer_class = HabitSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwner]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['is_pleasant', 'frequency', 'is_public']
+    filterset_fields = ["is_pleasant", "frequency", "is_public"]
 
     def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
+        if getattr(self, "swagger_fake_view", False):
             return Habit.objects.none()
 
-        if self.action == 'public':
+        if self.action == "public":
             return Habit.objects.filter(is_public=True)
         return Habit.objects.filter(user=self.request.user)
 
     def get_serializer_class(self):
-        if self.action in ['list', 'public']:
+        if self.action in ["list", "public"]:
             return HabitListSerializer
         return HabitSerializer
 
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    @action(
+        detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated]
+    )
     def public(self, request):
         """Список публичных привычек"""
         queryset = self.filter_queryset(Habit.objects.filter(is_public=True))

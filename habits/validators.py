@@ -10,9 +10,7 @@ def validate_habit(habit):
         )
 
     if habit.duration > 120:
-        raise ValidationError(
-            "Время выполнения не должно превышать 120 секунд."
-        )
+        raise ValidationError("Время выполнения не должно превышать 120 секунд.")
 
     if habit.related_habit and not habit.related_habit.is_pleasant:
         raise ValidationError(
@@ -21,9 +19,7 @@ def validate_habit(habit):
 
     if habit.is_pleasant:
         if habit.reward:
-            raise ValidationError(
-                "У приятной привычки не может быть вознаграждения."
-            )
+            raise ValidationError("У приятной привычки не может быть вознаграждения.")
         if habit.related_habit:
             raise ValidationError(
                 "У приятной привычки не может быть связанной привычки."

@@ -11,15 +11,21 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'password_confirm', 'telegram_chat_id']
+        fields = [
+            "username",
+            "email",
+            "password",
+            "password_confirm",
+            "telegram_chat_id",
+        ]
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['password_confirm']:
+        if attrs["password"] != attrs["password_confirm"]:
             raise serializers.ValidationError({"password": "Пароли не совпадают."})
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop('password_confirm')
+        validated_data.pop("password_confirm")
         user = User.objects.create_user(**validated_data)
         return user
 
@@ -27,5 +33,4 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'telegram_chat_id']
-        
+        fields = ["id", "username", "email", "telegram_chat_id"]

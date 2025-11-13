@@ -8,11 +8,20 @@ class HabitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Habit
         fields = [
-            'id', 'user', 'place', 'time', 'action', 'is_pleasant',
-            'related_habit', 'frequency', 'reward', 'duration',
-            'is_public', 'created_at'
+            "id",
+            "user",
+            "place",
+            "time",
+            "action",
+            "is_pleasant",
+            "related_habit",
+            "frequency",
+            "reward",
+            "duration",
+            "is_public",
+            "created_at",
         ]
-        read_only_fields = ['user', 'created_at']
+        read_only_fields = ["user", "created_at"]
 
     def validate(self, data):
         instance = Habit(**data)
@@ -29,7 +38,7 @@ class HabitSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
+        validated_data["user"] = self.context["request"].user
         return super().create(validated_data)
 
 
@@ -37,6 +46,13 @@ class HabitListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Habit
         fields = [
-            'id', 'place', 'time', 'action', 'is_pleasant',
-            'frequency', 'duration', 'is_public', 'created_at'
+            "id",
+            "place",
+            "time",
+            "action",
+            "is_pleasant",
+            "frequency",
+            "duration",
+            "is_public",
+            "created_at",
         ]
