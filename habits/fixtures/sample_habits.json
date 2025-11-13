@@ -1,0 +1,36 @@
+[
+  {
+    "model": "habits.habit",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "place": "Парк",
+      "time": "07:00:00",
+      "action": "Бегать 10 минут",
+      "is_pleasant": false,
+      "related_habit": null,
+      "frequency": "daily",
+      "reward": "Кофе",
+      "duration": 120,
+      "is_public": true,
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "place": "Дом",
+      "time": "08:00:00",
+      "action": "Медитировать 5 минут",
+      "is_pleasant": true,
+      "related_habit": null,
+      "frequency": "daily",
+      "reward": null,
+      "duration": 120,
+      "is_public": false,
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  }
+]

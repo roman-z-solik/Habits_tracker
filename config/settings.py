@@ -120,3 +120,10 @@ CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:63
 CELERY_TIMEZONE = TIME_ZONE
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+
+CELERY_BEAT_SCHEDULE = {
+    "check-habits-every-minute": {
+        "task": "telegram.tasks.check_habits_for_reminders",
+        "schedule": 60.0,
+    },
+}

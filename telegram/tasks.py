@@ -9,6 +9,7 @@ from django.utils import timezone
 def send_telegram_reminder(habit_id):
     try:
         from habits.models import Habit
+
         habit = Habit.objects.get(id=habit_id)
         user = habit.user
 
@@ -16,11 +17,13 @@ def send_telegram_reminder(habit_id):
             print(f"❌ У пользователя {user.username} не указан telegram_chat_id")
             return
 
-        message = f"🔔 **Напоминание о привычке!**\n\n" \
-                  f"📍 Место: {habit.place}\n" \
-                  f"⏰ Время: {habit.time.strftime('%H:%M')}\n" \
-                  f"🎯 Действие: {habit.action}\n" \
-                  f"⏱️ Время на выполнение: {habit.duration} секунд"
+        message = (
+            f"🔔 **Напоминание о привычке!**\n\n"
+            f"📍 Место: {habit.place}\n"
+            f"⏰ Время: {habit.time.strftime('%H:%M')}\n"
+            f"🎯 Действие: {habit.action}\n"
+            f"⏱️ Время на выполнение: {habit.duration} секунд"
+        )
 
         if habit.reward:
             message += f"\n🎁 Вознаграждение: {habit.reward}"
@@ -29,9 +32,9 @@ def send_telegram_reminder(habit_id):
 
         url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
         data = {
-            'chat_id': user.telegram_chat_id,
-            'text': message,
-            'parse_mode': 'Markdown'
+            "chat_id": user.telegram_chat_id,
+            "text": message,
+            "parse_mode": "Markdown",
         }
 
         response = requests.post(url, data=data)
@@ -52,14 +55,13 @@ def check_habits_for_reminders():
     print(f"🔍 Проверка привычек в {current_time}")
 
     habits = Habit.objects.filter(
-        time__hour=current_time.hour,
-        time__minute=current_time.minute
+        time__hour=current_time.hour, time__minute=current_time.minute
     )
 
     for habit in habits:
-        if habit.frequency == 'daily':
+        if habit.frequency == "daily":
             send_telegram_reminder.delay(habit.id)
-        elif habit.frequency == 'weekly' and current_weekday == 0:  # Понедельник
+        elif habit.frequency == "weekly" and current_weekday == 0:  # Понедельник
             send_telegram_reminder.delay(habit.id)
 
     print(f"📨 Найдено {habits.count()} привычек для напоминания")
