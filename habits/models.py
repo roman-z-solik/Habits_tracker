@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
 
+from habits.validators import validate_habit
+
 
 class Habit(models.Model):
     PERIOD_CHOICES = [
@@ -49,7 +51,8 @@ class Habit(models.Model):
         return f"{self.user.username}: {self.action}"
 
     def clean(self):
-        pass
+        validate_habit(self)
+        super().clean()
 
     def save(self, *args, **kwargs):
         self.full_clean()
