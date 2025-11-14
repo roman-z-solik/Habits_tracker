@@ -11,7 +11,7 @@ class HabitViewSet(viewsets.ModelViewSet):
     serializer_class = HabitSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwner]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["is_pleasant", "frequency", "is_public"]
+    filterset_fields = ["is_pleasant", "is_public"]  # Убрали frequency
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):

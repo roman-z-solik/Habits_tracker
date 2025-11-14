@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "users",
     "habits",
-    "telegram",
 ]
 
 MIDDLEWARE = [
@@ -64,8 +63,12 @@ TEMPLATES = [
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("BASE_NAME"),
+        "USER": os.getenv("BASE_USER"),
+        "PASSWORD": os.getenv("BASE_PASSWORD"),
+        "HOST": os.getenv("BASE_HOST"),
+        "PORT": os.getenv("BASE_PORT"),
     }
 }
 

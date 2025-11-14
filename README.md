@@ -56,22 +56,22 @@ Django REST API для трекера полезных привычек по к�
 - Запрещает приятным привычкам иметь вознаграждение или связанные привычки
 
 `habits/permissions.py`:
-
 Класс IsOwner - разрешение только для владельца объекта привычки
 
-### Приложение telegram
+### Приложение habits (дополнение)
 
-`telegram/tasks.py`:
+`habits/tasks.py`:
 
-Функция send_telegram_reminder - задача Celery для отправки напоминаний о привычках  
-Функция check_habits_for_reminders - периодическая задача для проверки привычек, которые нужно выполнить
+Функция send_telegram_reminder - задача Celery для отправки напоминаний о привычках через Telegram  
+Функция check_habits_for_reminders - периодическая задача для проверки привычек, которые нужно выполнить  
+Функция send_daily_reminders - ежедневная проверка привычек для напоминаний
 
 ## API Endpoints
 
 ### Аутентификация
 
-- `POST /api/token/` - получение JWT токена
-- `POST /api/token/refresh/` - обновление JWT токена
+- `POST /api/users/token/` - получение JWT токена
+- `POST /api/users/token/refresh/` - обновление JWT токена
 
 ### Пользователи
 
@@ -202,4 +202,4 @@ flake8 --exclude=migrations --max-line-length=119
 [Redis](https://redis.io/) - кэш и брокер сообщений для Celery
 
 ## Команда проекта
-[Roman Z](roman-z@inbox.ru)
+[Roman Z](https://github.com/roman-z-solik)
