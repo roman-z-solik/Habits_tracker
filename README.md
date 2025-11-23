@@ -183,6 +183,20 @@ python manage.py test
 flake8 --exclude=migrations --max-line-length=119
 ```
 
+## Запуск через Docker
+
+### Предварительные требования
+- Установленный [Docker](https://docs.docker.com/get-docker/)
+- Установленный [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Шаги для запуска
+
+1. **Клонируйте репозиторий:**
+```bash
+git clone git@github.com:roman-z-solik/Habits_tracker.git
+cd Habits_tracker
+```
+
 ## Требования
 ### Для установки и запуска проекта, необходимы:
 
