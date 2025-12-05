@@ -32,10 +32,12 @@ jobs:
       run: |
         docker build -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} .
         docker build -t ${{ env.DOCKER_IMAGE }}:latest .
+
     - name: Push Docker image
       run: |
         docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
         docker push ${{ env.DOCKER_IMAGE }}:latest
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -55,7 +57,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         script: |
           cd /home/appuser/project
-          git pull origin feature-docker
+          # git pull origin feature-docker
           source venv/bin/activate
           pip install -r requirements.txt
           python manage.py migrate --noinput
