@@ -56,8 +56,6 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-          eval "$(ssh-agent -s)"
-          echo "$SSH_PASSPHRASE" | ssh-add ~/.ssh/id_rsa_github
           cd /home/appuser/project
           git pull origin feature-docker
           source venv/bin/activate
@@ -66,5 +64,3 @@ jobs:
           python manage.py collectstatic --noinput
           sudo systemctl restart gunicorn
           sudo systemctl restart nginx
-      env:
-        SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
