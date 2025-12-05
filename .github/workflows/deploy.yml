@@ -38,22 +38,16 @@ jobs:
         docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
         docker push ${{ env.DOCKER_IMAGE }}:latest
 
-    - name: Create SSH key file
+    - name: Test SSH connection
       run: |
-        # Создаем файл с ключом
         echo "$SSH_PRIVATE_KEY" > deploy_key
+        chmod 600 deploy_key
         
-        # Проверяем начало и конец (первые/последние 20 символов без маскировки)
-        echo "Начало ключа (hex):"
-        head -c 20 deploy_key | xxd -p
-        echo "Конец ключа (hex):"
-        tail -c 20 deploy_key | xxd -p
+        echo "=== Тест 1: Простое подключение ==="
+        ssh -o StrictHostKeyChecking=no -v -i deploy_key ${{ secrets.SSH_USER }}@${{ secrets.HOST }} "whoami"
         
-        # Проверяем структуру
-        echo "Первая строка:"
-        head -1 deploy_key
-        echo "Последняя строка:"
-        tail -1 deploy_key
+        echo "=== Тест 2: Проверка доступа ==="
+        ssh -o StrictHostKeyChecking=no -i deploy_key ${{ secrets.SSH_USER }}@${{ secrets.HOST }} "ls -la ~/.ssh/authorized_keys && echo 'Проверка завершена'"
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
 
