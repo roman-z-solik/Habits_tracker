@@ -38,18 +38,6 @@ jobs:
         docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
         docker push ${{ env.DOCKER_IMAGE }}:latest
 
-    - name: Test SSH connection
-      run: |
-        echo "$SSH_PRIVATE_KEY" > deploy_key
-        chmod 600 deploy_key
-        
-        echo "=== Тест 1: Простое подключение ==="
-        ssh -o StrictHostKeyChecking=no -v -i deploy_key ${{ secrets.SSH_USER }}@${{ secrets.HOST }} "whoami"
-        
-        echo "=== Тест 2: Проверка доступа ==="
-        ssh -o StrictHostKeyChecking=no -i deploy_key ${{ secrets.SSH_USER }}@${{ secrets.HOST }} "ls -la ~/.ssh/authorized_keys && echo 'Проверка завершена'"
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
 
   deploy:
     runs-on: ubuntu-latest
