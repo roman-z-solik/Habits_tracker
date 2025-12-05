@@ -8,28 +8,24 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: Start PostgreSQL (без health-check)
+    - name: Install system dependencies
       run: |
-        docker run -d \
-          --name postgres-ci \
-          -e POSTGRES_PASSWORD=postgres \
-          -e POSTGRES_DB=test_db \
-          -p 5433:5432 \
-          postgres:13
-        sleep 15
+        sudo apt-get update
+        sudo apt-get install -y postgresql postgresql-contrib redis-server
+        sudo systemctl start postgresql
+        sudo systemctl start redis
 
-    - name: Start Redis
+    - name: Setup PostgreSQL database
       run: |
-        docker run -d \
-          --name redis-ci \
-          -p 6380:6379 \
-          redis:7-alpine
-        sleep 5
+        sudo -u postgres psql -c "CREATE DATABASE test_db;"
+        sudo -u postgres psql -c "CREATE USER test_user WITH PASSWORD 'test123';"
+        sudo -u postgres psql -c "ALTER USER test_user CREATEDB;"
+        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE test_db TO test_user;"
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -47,19 +43,14 @@ jobs:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DB_ENGINE: django.db.backends.postgresql
         DB_NAME: test_db
-        DB_USER: postgres
-        DB_PASSWORD: postgres
+        DB_USER: test_user
+        DB_PASSWORD: test123
         DB_HOST: localhost
-        DB_PORT: 5433
+        DB_PORT: 5432
         ALLOWED_HOSTS: localhost,127.0.0.1
-        CELERY_BROKER_URL: redis://localhost:6380/0
+        CELERY_BROKER_URL: redis://localhost:6379/0
       run: |
         python manage.py test
-
-    - name: Cleanup
-      run: |
-        docker stop postgres-ci redis-ci || true
-        docker rm postgres-ci redis-ci || true
 
   deploy:
     needs: test
