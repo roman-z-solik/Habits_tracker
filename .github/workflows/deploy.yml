@@ -52,8 +52,8 @@ jobs:
     - name: Deploy to server
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: "158.160.170.143"
+        username: "appuser"
         key: ${{ secrets.SSH_KEY }}
         script: |
           cd /home/appuser/project
