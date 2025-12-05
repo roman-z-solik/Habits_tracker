@@ -38,19 +38,24 @@ jobs:
         docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
         docker push ${{ env.DOCKER_IMAGE }}:latest
 
-    - name: Debug SSH Key
+    - name: Create SSH key file
       run: |
-        echo "Длина ключа: ${#SSH_KEY}"
-        echo "--- Начало ключа ---"
-        echo "${SSH_KEY:0:100}"
-        echo "--- Конец ключа ---"
-        echo "${SSH_KEY: -100}"
-        echo "--- Сохраняем в файл ---"
-        echo "$SSH_KEY" > debug_key
-        head -2 debug_key
-        tail -2 debug_key
+        # Создаем файл с ключом
+        echo "$SSH_PRIVATE_KEY" > deploy_key
+        
+        # Проверяем начало и конец (первые/последние 20 символов без маскировки)
+        echo "Начало ключа (hex):"
+        head -c 20 deploy_key | xxd -p
+        echo "Конец ключа (hex):"
+        tail -c 20 deploy_key | xxd -p
+        
+        # Проверяем структуру
+        echo "Первая строка:"
+        head -1 deploy_key
+        echo "Последняя строка:"
+        tail -1 deploy_key
       env:
-        SSH_KEY: ${{ secrets.SSH_KEY }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
 
   deploy:
     runs-on: ubuntu-latest
