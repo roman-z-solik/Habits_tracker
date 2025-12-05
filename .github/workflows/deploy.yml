@@ -38,6 +38,20 @@ jobs:
         docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
         docker push ${{ env.DOCKER_IMAGE }}:latest
 
+    - name: Debug SSH Key
+      run: |
+        echo "Длина ключа: ${#SSH_KEY}"
+        echo "--- Начало ключа ---"
+        echo "${SSH_KEY:0:100}"
+        echo "--- Конец ключа ---"
+        echo "${SSH_KEY: -100}"
+        echo "--- Сохраняем в файл ---"
+        echo "$SSH_KEY" > debug_key
+        head -2 debug_key
+        tail -2 debug_key
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -55,7 +69,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_KEY }}
-#        passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
           cd /home/appuser/project
           git pull origin feature-docker
