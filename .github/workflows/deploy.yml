@@ -13,23 +13,18 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Start PostgreSQL
-      run: |
-        docker run -d \
-          --name postgres \
-          -e POSTGRES_PASSWORD=postgres \
-          -e POSTGRES_DB=test_db \
-          -p 5432:5432 \
-          postgres:13
-        sleep 10
+    - name: Setup PostgreSQL
+      uses: Harmon758/postgresql-action@v1
+      with:
+        postgresql version: '13'
+        postgresql db: test_db
+        postgresql user: postgres
+        postgresql password: postgres
 
-    - name: Start Redis
-      run: |
-        docker run -d \
-          --name redis \
-          -p 6379:6379 \
-          redis:7-alpine
-        sleep 5
+    - name: Setup Redis
+      uses: supercharge/redis-github-action@1.5.0
+      with:
+        redis-version: 7
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -40,13 +35,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-
-    - name: Wait for PostgreSQL
-      run: |
-        for i in {1..10}; do
-          pg_isready -h localhost -p 5432 && break
-          sleep 2
-        done
 
     - name: Run tests
       env:
@@ -62,11 +50,6 @@ jobs:
         CELERY_BROKER_URL: redis://localhost:6379/0
       run: |
         python manage.py test
-
-    - name: Cleanup
-      run: |
-        docker stop postgres redis || true
-        docker rm postgres redis || true
 
   deploy:
     needs: test
