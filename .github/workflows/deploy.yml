@@ -18,6 +18,8 @@ jobs:
           POSTGRES_DB: test_db
         ports:
           - 5432:5432
+        # Явно отключаем health-check
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
       redis:
         image: redis:7-alpine
@@ -38,7 +40,11 @@ jobs:
         pip install -r requirements.txt
 
     - name: Wait for PostgreSQL
-      run: sleep 10
+      run: |
+        for i in {1..10}; do
+          pg_isready -h localhost -p 5432 && break
+          sleep 2
+        done
 
     - name: Run tests
       env:
