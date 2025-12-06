@@ -27,13 +27,11 @@ jobs:
         sudo apt-get install -y postgresql postgresql-contrib
         sudo service postgresql start
         sudo -u postgres psql -c "CREATE DATABASE habits_tracker;"
-        sudo -u postgres psql -c "CREATE USER test_user WITH PASSWORD 'test_pass';"
-        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE habits_tracker TO test_user;"
 
     - name: Create .env for tests
       run: |
         echo "SECRET_KEY=test-key-123" > .env
-        echo "DATABASE_URL=postgresql://test_user:test_pass@localhost:5432/habits_tracker" >> .env
+        echo "DATABASE_URL=postgresql://postgres@localhost:5432/habits_tracker" >> .env
         echo "DEBUG=True" >> .env
 
     - name: Install dependencies
