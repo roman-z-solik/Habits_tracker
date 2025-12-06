@@ -27,11 +27,14 @@ jobs:
         sudo apt-get install -y postgresql postgresql-contrib
         sudo service postgresql start
         sudo -u postgres psql -c "CREATE DATABASE habits_tracker;"
+        sudo -u postgres psql -c "CREATE USER runner WITH SUPERUSER;"
+        sudo -u postgres psql -c "ALTER USER runner WITH PASSWORD 'runner';"
+        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE habits_tracker TO runner;"
 
     - name: Create .env for tests
       run: |
         echo "SECRET_KEY=test-key-123" > .env
-        echo "DATABASE_URL=postgresql://postgres@127.0.0.1:5432/habits_tracker" >> .env
+        echo "DATABASE_URL=postgresql://runner:runner@localhost:5432/habits_tracker" >> .env
         echo "DEBUG=True" >> .env
 
     - name: Install dependencies
