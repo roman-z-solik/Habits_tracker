@@ -69,6 +69,9 @@ DATABASES = {
         "PASSWORD": os.getenv("BASE_PASSWORD"),
         "HOST": os.getenv("BASE_HOST"),
         "PORT": os.getenv("BASE_PORT"),
+        'TEST': {
+            'NAME': 'test_habits_tracker',
+        }
     }
 }
 

@@ -35,7 +35,6 @@ jobs:
       run: |
         echo "SECRET_KEY=test-key-123" > .env
         echo "DEBUG=True" >> .env
-        echo "DB_ENGINE=django.db.backends.postgresql" >> .env
         echo "DB_NAME=habits_tracker" >> .env
         echo "DB_USER=runner" >> .env
         echo "DB_PASSWORD=runner" >> .env
