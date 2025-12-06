@@ -12,6 +12,20 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
     - uses: actions/checkout@v3
@@ -21,20 +35,18 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install and start PostgreSQL
+    - name: Install PostgreSQL client
+      run: sudo apt-get install -y postgresql-client
+
+    - name: Wait for PostgreSQL
       run: |
-        sudo apt-get update
-        sudo apt-get install -y postgresql postgresql-contrib libpq-dev
-        sudo service postgresql start
-        sudo -u postgres psql -c "CREATE DATABASE test_db;"
-        sudo -u postgres psql -c "CREATE USER test_user WITH PASSWORD 'test_pass';"
-        sudo -u postgres psql -c "ALTER USER test_user CREATEDB;"
-        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE test_db TO test_user;"
+        sleep 5
+        pg_isready -h localhost -p 5432
 
     - name: Create .env for tests
       run: |
         echo "SECRET_KEY=test-key-123" > .env
-        echo "DATABASE_URL=postgresql://test_user:test_pass@localhost:5432/test_db" >> .env
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/github_actions" >> .env
         echo "DEBUG=True" >> .env
 
     - name: Install dependencies
