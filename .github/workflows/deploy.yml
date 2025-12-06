@@ -34,8 +34,13 @@ jobs:
     - name: Create .env for tests
       run: |
         echo "SECRET_KEY=test-key-123" > .env
-        echo "DATABASE_URL=postgresql://runner:runner@localhost:5432/habits_tracker?name=habits_tracker" >> .env
         echo "DEBUG=True" >> .env
+        echo "DB_ENGINE=django.db.backends.postgresql" >> .env
+        echo "DB_NAME=habits_tracker" >> .env
+        echo "DB_USER=runner" >> .env
+        echo "DB_PASSWORD=runner" >> .env
+        echo "DB_HOST=localhost" >> .env
+        echo "DB_PORT=5432" >> .env
 
     - name: Install dependencies
       run: |
