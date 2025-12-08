@@ -45,7 +45,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
     - name: Setup PostgreSQL for tests
       run: |
@@ -183,6 +183,16 @@ jobs:
           git fetch --all
           git checkout feature-docker
           git reset --hard origin/feature-docker
+          
+          if docker ps --format '{{.Names}}' | grep -q habits_db; then
+              docker stop habits_db
+              docker rm habits_db
+          fi
+          
+          PORT_PID=$(sudo lsof -ti:5432 2>/dev/null || true)
+          if [ ! -z "$PORT_PID" ]; then
+              sudo kill -9 $PORT_PID
+          fi
           
           mkdir -p nginx
           
