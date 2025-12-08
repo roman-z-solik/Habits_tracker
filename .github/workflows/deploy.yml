@@ -186,7 +186,8 @@ jobs:
           
           docker-compose up -d --build
           
-          docker-compose exec -T web python manage.py migrate --noinput --fake
+          docker-compose exec -T web python manage.py migrate django_celery_beat --noinput --fake
+          
           docker-compose exec -T web python manage.py migrate --noinput
           
           docker-compose exec -T web python manage.py collectstatic --noinput
