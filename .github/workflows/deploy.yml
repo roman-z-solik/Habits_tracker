@@ -180,35 +180,26 @@ jobs:
         script: |
           cd /home/appuser/project
           
-          echo "=== Creating .env file ==="
+          git fetch --all
+          git checkout feature-docker
+          git reset --hard origin/feature-docker
+          
+          mkdir -p nginx
+          
           echo "${{ secrets.ENV_FILE }}" > .env
           
-          echo "=== Checking files ==="
-          ls -la
-          ls -la nginx/
-          
-          echo "=== Starting deployment ==="
           docker-compose down
           
           docker-compose pull
           
           docker-compose up -d --build
           
-          echo "=== Waiting for services ==="
-          sleep 30
-          
-          echo "=== Running migrations ==="
           docker-compose exec -T web python manage.py migrate --noinput
           
-          echo "=== Collecting static ==="
           docker-compose exec -T web python manage.py collectstatic --noinput
           
-          echo "=== Checking containers ==="
           docker-compose ps
           
-          echo "=== Checking logs ==="
-          docker-compose logs web --tail=20
-          
-          echo "=== Testing application ==="
           sleep 10
-          curl -f http://localhost:8080/ || echo "Application not responding"
+          
+          curl -f http://localhost:8080/
