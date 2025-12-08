@@ -213,7 +213,52 @@ cd Habits_tracker
 [PostgreSQL](https://www.postgresql.org/) - система управления базами данных
 
 ![Redis](https://img.shields.io/badge/Redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)  
-[Redis](https://redis.io/) - кэш и брокер сообщений для Celery
+[Redis](https://redis.io/) - кэш и брокер сообщений для Celery  
+
+## CI/CD Pipeline
+
+Проект использует GitHub Actions для автоматизации сборки, тестирования и деплоя.
+
+### Workflow файл
+`.github/workflows/deploy.yaml` содержит 3 этапа:
+
+1. **test** - запуск тестов Django с PostgreSQL
+   - Установка PostgreSQL
+   - Создание тестовой базы данных
+   - Запуск миграций
+   - Выполнение всех тестов
+
+2. **build** - сборка Docker образа
+   - Сборка образа с тегом SHA коммита
+   - Сборка образа с тегом `latest`
+   - Публикация в Docker Hub
+
+3. **deploy** - деплой на production сервер
+   - SSH подключение к серверу
+   - Активация виртуального окружения
+   - Установка зависимостей
+   - Применение миграций
+   - Сбор статических файлов
+   - Перезапуск gunicorn и nginx
+
+### Требуемые Secrets в GitHub
+Для работы пайплайна необходимо настроить:
+- `DOCKER_HUB_USERNAME` - логин Docker Hub
+- `DOCKER_HUB_ACCESS_TOKEN` - токен доступа Docker Hub
+- `HOST` - IP адрес сервера
+- `SSH_USER` - пользователь для SSH подключения
+- `SSH_KEY` - приватный SSH ключ
+
+### Запуск
+Пайплайн запускается автоматически при:
+- Push в ветку `feature-docker`
+- Pull request в ветку `develop`
+
+### Особенности
+- Тесты выполняются с PostgreSQL 15
+- Используется отдельная тестовая база данных
+- Деплой происходит только после успешного прохождения тестов
+- Docker образы версионируются по хешу коммита
 
 ## Команда проекта
 [Roman Z](https://github.com/roman-z-solik)
