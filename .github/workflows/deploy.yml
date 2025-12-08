@@ -177,7 +177,7 @@ jobs:
           
           echo "${{ secrets.ENV_FILE }}" > .env
           
-          docker-compose down
+          docker-compose down -v
           
           docker-compose pull
           
