@@ -150,36 +150,37 @@ TELEGRAM_BOT_TOKEN      #Your telegram bot token from botfather
 TELEGRAM_ADMIN_CHAT_ID  #Your telegram chat id from userinfobot  
 
 ## Запуск приложения
+
+### Выполнение миграций
 ```bash
-# Выполнение миграций
 python manage.py migrate
 ```
+### Создание суперпользователя
 ```bash
-# Создание суперпользователя
 python manage.py createsuperuser
 ```
 
+### Запуск сервера разработки
 ```bash
-# Запуск сервера разработки
 python manage.py runserver
 ```
 
+### Запуск Celery worker (в отдельном терминале)
 ```bash
-# Запуск Celery worker (в отдельном терминале)
 celery -A config worker -l info
 ```
 
+### Запуск Celery beat (в отдельном терминале)
 ```bash
-# Запуск Celery beat (в отдельном терминале)
 celery -A config beat -l info
 ```
-```bash
-Запуск тестов
+## Запуск тестов
 Для запуска тестов выполните команду:
+```bash
 python manage.py test
 ```
+### Проверка качества кода
 ```bash
-#Проверка качества кода
 flake8 --exclude=migrations --max-line-length=119
 ```
 
@@ -195,6 +196,129 @@ flake8 --exclude=migrations --max-line-length=119
 ```bash
 git clone git@github.com:roman-z-solik/Habits_tracker.git
 cd Habits_tracker
+```
+
+## Детальный зпуск через DOCKER COMPOSE
+### Сборка и запуск контейнеров
+
+Выполните команду для сборки и запуска всех сервисов:
+```bash
+docker-compose up --build -d
+```
+После запуска проверьте статус контейнеров:
+```bash
+docker-compose ps
+```
+## Создание суперпользователя
+### Для создания администратора выполните:
+```bash
+docker-compose exec web python manage.py createsuperuser
+```
+## Остановка и очистка
+### Остановить все контейнеры:
+```bash
+docker-compose down
+```
+Остановить и удалить все тома (включая базу данных):
+```bash
+docker-compose down -v
+```
+
+## Подробная информация о контейнерах
+
+### Сервисы, запускаемые через Docker Compose:
+db: PostgreSQL 15 для хранения данных  
+redis: Redis 7 для кэширования и очередей Celery  
+web: Django-приложение с Gunicorn  
+nginx: Веб-сервер для статических файлов и прокси  
+celery: Worker для обработки фоновых задач  
+celery-beat: Scheduler для периодических задач  
+
+### Порты:
+Веб-приложение: localhost:80 или localhost:8080   
+PostgreSQL: localhost:5432  
+Redis: localhost:6379
+
+## Настройка CI/CD пайплайн
+
+### Требуемые Secrets в репозитории GitHub
+
+В настройках репозитория GitHub добавьте следующие Secrets:  
+DOCKER_HUB_USERNAME: Логин в Docker Hub  
+DOCKER_HUB_ACCESS_TOKEN: Токен доступа Docker Hub  
+HOST: IP-адрес сервера для деплоя  
+SSH_USER: Имя пользователя для SSH-подключения  
+SSH_KEY: Приватный SSH-ключ для доступа к GitHub  
+SSH_KEY_SERVER: Приватный ключ для подключения к GitHub с сервера  
+ENV_FILE: Содержимое файла .env для продакшена
+
+### Этапы пайплайна
+Lint: Проверка кода с помощью flake8 и black  
+Test: Запуск тестов Django с PostgreSQL  
+Docker-build: Валидация и сборка Docker-образов  
+Build-and-push: Сборка и публикация образов в Docker Hub  
+Deploy: Автоматический деплой на сервер  
+
+### Триггеры запуска  
+
+Пайплайн запускается автоматически при:
+Push в ветку feature-docker
+Pull request в ветку develop
+
+## Ручной деплой на сервер
+
+Для ручного деплоя выполните на сервере:
+```bash
+git clone git@github.com:roman-z-solik/Habits_tracker.git
+```
+```bash
+cd Habits_tracker
+```
+Создайте файл .env с настройками для продакшена
+```bash
+docker-compose up --build -d
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py collectstatic --noinput
+docker-compose exec web python manage.py createsuperuser
+```
+## Мониторинг и логи
+
+Просмотр логов всех сервисов:
+```bash
+docker-compose logs -f
+```
+Просмотр логов конкретного сервиса:
+```bash
+docker-compose logs -f web
+docker-compose logs -f celery
+docker-compose logs -f db
+```
+
+## Устранение неисправностей
+
+Проблема: Контейнеры не запускаются  
+Решение: Проверьте файл .env и права доступа  
+
+Проблема: База данных не подключается  
+Решение: Убедитесь, что PostgreSQL запущен и доступен  
+
+Проблема: Nginx отдает ошибку 502  
+Решение: Проверьте, запущен ли контейнер web  
+
+Проблема: Telegram-бот не отправляет сообщения  
+Решение: Проверьте токен бота и chat_id в .env  
+
+## Обновление проекта на сервере
+
+Для обновления проекта на продакшн-сервере:  
+На сервере: 
+```bash
+git pull origin feature-docker
+docker-compose down
+docker-compose pull
+docker-compose up --build -d
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py collectstatic --noinput
 ```
 
 ## Требования
