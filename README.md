@@ -9,6 +9,7 @@ Django REST API для трекера полезных привычек по к�
 ![Celery](https://img.shields.io/badge/Celery-%2337814A.svg?style=for-the-badge&logo=celery&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
 ![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)
 
 ## Использование
@@ -187,6 +188,7 @@ flake8 --exclude=migrations --max-line-length=119
 ## Запуск через Docker
 
 ### Предварительные требования
+![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
 - Установленный [Docker](https://docs.docker.com/get-docker/)
 - Установленный [Docker Compose](https://docs.docker.com/compose/install/)
 
