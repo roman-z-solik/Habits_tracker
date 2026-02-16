@@ -2,18 +2,18 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:13
+    image: postgres:latest
     container_name: habits_db
     environment:
-      POSTGRES_DB: ${BASE_NAME:-habit_tracker}
-      POSTGRES_USER: ${BASE_USER:-postgres}
-      POSTGRES_PASSWORD: ${BASE_PASSWORD:-password}
+      POSTGRES_DB: ${BASE_NAME}
+      POSTGRES_USER: ${BASE_USER}
+      POSTGRES_PASSWORD: ${BASE_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${BASE_USER:-postgres} -d ${BASE_NAME:-habit_tracker}"]
+      test: ["CMD-SHELL", "pg_isready -U ${BASE_USER} -d ${BASE_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,38 +28,60 @@ services:
     build: .
     container_name: habits_web
     command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+      sh -c "if [ ! -f .env ]; then 
+               echo 'ОШИБКА: Файл .env не найден!'; 
+               echo 'Создайте файл .env на основе .env.example'; 
+               exit 1; 
+             fi && 
+             python manage.py migrate --noinput && 
+             python manage.py collectstatic --noinput && 
+             gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
     volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
     env_file:
       - .env
     environment:
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=${BASE_HOST}
+      - POSTGRES_PORT=${BASE_PORT}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_ADMIN_CHAT_ID=${TELEGRAM_ADMIN_CHAT_ID}
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
 
+  nginx:
+    build: ./nginx
+    container_name: habits_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    depends_on:
+      - web
+
   celery:
     build: .
     container_name: habits_celery
     command: celery -A config worker -l info
     volumes:
-      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
     env_file:
       - .env
     environment:
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=${BASE_HOST}
+      - POSTGRES_PORT=${BASE_PORT}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_ADMIN_CHAT_ID=${TELEGRAM_ADMIN_CHAT_ID}
     depends_on:
       db:
         condition: service_healthy
@@ -71,14 +93,17 @@ services:
     container_name: habits_celery_beat
     command: celery -A config beat -l info
     volumes:
-      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
     env_file:
       - .env
     environment:
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=${BASE_HOST}
+      - POSTGRES_PORT=${BASE_PORT}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_ADMIN_CHAT_ID=${TELEGRAM_ADMIN_CHAT_ID}
     depends_on:
       db:
         condition: service_healthy
@@ -87,3 +112,5 @@ services:
 
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:
